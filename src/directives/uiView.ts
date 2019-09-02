@@ -1,6 +1,7 @@
 /** @ng2api @module directives */
 /** */
 import {
+  AfterViewInit,
   Component,
   ComponentFactory,
   ComponentFactoryResolver,
@@ -116,13 +117,12 @@ const ng2ComponentInputs = (factory: ComponentFactory<any>): InputMapping[] => {
   exportAs: 'uiView',
   template: `
     <ng-template #componentTarget></ng-template>
-    <ng-content *ngIf="!_componentRef"></ng-content>
   `,
 })
-export class UIView implements OnInit, OnDestroy {
+export class UIView implements OnInit, OnDestroy, AfterViewInit {
   static PARENT_INJECT = 'UIView.PARENT_INJECT';
 
-  @ViewChild('componentTarget', { read: ViewContainerRef })
+  @ViewChild('componentTarget', { read: ViewContainerRef, static: false })
   _componentTarget: ViewContainerRef;
   @Input('name') name: string;
 
@@ -160,6 +160,17 @@ export class UIView implements OnInit, OnDestroy {
 
   ngOnInit() {
     const router = this.router;
+
+    this._deregisterUiCanExitHook = router.transitionService.onBefore({}, trans => {
+      return this._invokeUiCanExitHook(trans);
+    });
+
+    this._deregisterUiOnParamsChangedHook = router.transitionService.onSuccess({}, trans =>
+      this._invokeUiOnParamsChangedHook(trans)
+    );
+  }
+
+  ngAfterViewInit() {
     const parentFqn = this._parent.fqn;
     const name = this.name || '$default';
 
@@ -173,15 +184,7 @@ export class UIView implements OnInit, OnDestroy {
       config: undefined,
     };
 
-    this._deregisterUiCanExitHook = router.transitionService.onBefore({}, trans => {
-      return this._invokeUiCanExitHook(trans);
-    });
-
-    this._deregisterUiOnParamsChangedHook = router.transitionService.onSuccess({}, trans =>
-      this._invokeUiOnParamsChangedHook(trans)
-    );
-
-    this._deregisterUIView = router.viewService.registerUIView(this._uiViewData);
+    this._deregisterUIView = this.router.viewService.registerUIView(this._uiViewData);
   }
 
   /**
