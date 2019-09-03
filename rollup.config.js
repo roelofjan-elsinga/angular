@@ -17,7 +17,7 @@ let uglifyOpts = { output: {} };
 // retain multiline comment with @license
 uglifyOpts.output.comments = (node, comment) => comment.type === 'comment2' && /@license/i.test(comment.value);
 
-let plugins = [nodeResolve({ jsnext: true }), sourcemaps(), commonjs()];
+let plugins = [nodeResolve(), sourcemaps(), commonjs()];
 
 if (MINIFY) plugins.push(uglify(uglifyOpts));
 

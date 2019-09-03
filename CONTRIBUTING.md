@@ -70,7 +70,9 @@ cd ..
 ## Link the directories
 
 This step is necessary if you need to modify any code in `@uirouter/core`.
-Using `npm`, link `@uirouter/core` into `@uirouter/angular`
+Using `npm`, link `@uirouter/core` into `@uirouter/angular`. 
+
+If you're simply trying to test your changes in your own project, you can skip ahead to "Testing the release in your own project".
 
 ```
 cd core
@@ -92,3 +94,19 @@ If you make changes in `@uirouter/core`, run these scripts before rebuilding or 
 
 - `npm run build`: Compiles `@uirouter/core` code
 - `npm run watch`: Continuously builds the `@uirouter/core` code when sources change.
+
+## Creating a release
+
+A release can be created by running ``npm run transpile``. This creates the different builds you can use to distribute to the NPM registry.
+
+You can find the release in the ``dist`` folder. To publish this build to the NPM registry, you will need to run: ``npm publish dist``.
+
+## Testing the release in your own project
+
+When testing this package in your own project, make sure to follow these steps:
+
+- ``npm run transpile``
+- ``cd dist``
+- ``npm link``
+- ``cd /path/to/your/project``
+- ``npm link @uirouter/link``
